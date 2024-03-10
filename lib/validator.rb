@@ -1,9 +1,9 @@
 require 'date'
 class ValidationError < StandardError
-  attr_reader :field
+  attr_reader :invalid_field
 
-  def initialize(msg = 'Default message', field = 'unknown')
-    @field = field
+  def initialize(msg = 'Default message', invalid_field:)
+    @invalid_field = invalid_field
     super(msg)
   end
 end
@@ -16,11 +16,11 @@ module Validator
   FIRST_NAME_PLACEHOLDER = 'X'.freeze
 
   def self.validate_record(record:)
-    raise ValidationError.new record[0], 'last_name' unless self.last_name_valid?(record[0])
-    raise ValidationError.new record[1], 'first_name' unless self.first_name_valid?(record[1])
-    raise ValidationError.new record[2], 'date_of_birth' unless self.date_of_birth_valid?(record[2])
-    raise ValidationError.new record[3], 'driver_id' unless self.driver_id_valid?(driver_id: record[3], first_name: record[1], last_name: record[0])
-    raise ValidationError.new record[4], 'entitlements' unless self.entitlements_valid?(record[4])
+    raise ValidationError.new record, invalid_field: 'last_name' unless self.last_name_valid?(record[0])
+    raise ValidationError.new record, invalid_field: 'first_name' unless self.first_name_valid?(record[1])
+    raise ValidationError.new record, invalid_field: 'date_of_birth' unless self.date_of_birth_valid?(record[2])
+    raise ValidationError.new record, invalid_field: 'driver_id' unless self.driver_id_valid?(driver_id: record[3], first_name: record[1], last_name: record[0])
+    raise ValidationError.new record, invalid_field: 'entitlements' unless self.entitlements_valid?(record[4])
   end
 
   def self.first_name_valid?(first_name)
