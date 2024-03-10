@@ -1,9 +1,10 @@
 require 'date'
 class ValidationError < StandardError
-  attr_reader :invalid_field
+  attr_reader :invalid_field, :value
 
-  def initialize(msg = 'Default message', invalid_field:)
+  def initialize(msg = 'Default message', invalid_field:, value:)
     @invalid_field = invalid_field
+    @value = value
     super(msg)
   end
 end
@@ -16,11 +17,11 @@ module Validator
   FIRST_NAME_PLACEHOLDER = 'X'.freeze
 
   def self.validate_record(record:)
-    raise ValidationError.new record, invalid_field: 'last_name' unless self.last_name_valid?(record[0])
-    raise ValidationError.new record, invalid_field: 'first_name' unless self.first_name_valid?(record[1])
-    raise ValidationError.new record, invalid_field: 'date_of_birth' unless self.date_of_birth_valid?(record[2])
-    raise ValidationError.new record, invalid_field: 'driver_id' unless self.driver_id_valid?(driver_id: record[3], first_name: record[1], last_name: record[0])
-    raise ValidationError.new record, invalid_field: 'entitlements' unless self.entitlements_valid?(record[4])
+    raise ValidationError.new "Invalid last name", invalid_field: 'last_name', value: record.last_name unless self.last_name_valid?(record.last_name)
+    raise ValidationError.new "Invalid first name", invalid_field: 'first_name', value: record.first_name unless self.first_name_valid?(record.first_name)
+    raise ValidationError.new "Invalid date of birth", invalid_field: 'date_of_birth', value: record.date_of_birth unless self.date_of_birth_valid?(record.date_of_birth)
+    raise ValidationError.new "Invalid driver ID", invalid_field: 'driver_id', value: record.driver_id unless self.driver_id_valid?(driver_id: record.driver_id, first_name: record.first_name, last_name: record.last_name)
+    raise ValidationError.new "Invalid entitlements", invalid_field: 'entitlements', value: record.entitlements unless self.entitlements_valid?(record.entitlements)
   end
 
   def self.first_name_valid?(first_name)
@@ -32,7 +33,7 @@ module Validator
   end
 
   def self.last_name_valid?(last_name)
-    if last_name.match?(NAME_REGEX)
+    if !last_name.empty? || last_name.match?(NAME_REGEX)
       true
     else
       false

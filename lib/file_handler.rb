@@ -1,16 +1,21 @@
 require 'csv'
 module FileHandler
+  REQUIRED_HEADERS = %w[lastName firstName dateOfBirth driverID entitlements].freeze
   def self.load_file(filename)
-    CSV.read(filename)
+    file = CSV.read(filename)
+    raise 'Invalid headers' unless file.first == REQUIRED_HEADERS
+
+    file.drop(1)
   end
 
+
   def self.save_to_file(filename: 'default', file: )
-    # This needs to handle 'file' being either a hash or an array
-    # it should convert it to a csv and save it to the filename
     File.open(filename, 'w') do |f|
+      f.puts REQUIRED_HEADERS.join(',')
       file.each do |record|
-        f.puts record
+        f.puts record.as_csv
       end
     end
   end
 end
+
