@@ -8,8 +8,7 @@ module FileHandler
     file.drop(1)
   end
 
-
-  def self.save_to_file(filename: 'default', file: )
+  def self.save_to_file(file:, filename: 'default')
     File.open(filename, 'w') do |f|
       f.puts REQUIRED_HEADERS.join(',')
       file.each do |record|
@@ -18,4 +17,3 @@ module FileHandler
     end
   end
 end
-

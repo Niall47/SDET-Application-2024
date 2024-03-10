@@ -83,7 +83,7 @@ describe Validator do
     # -	A person cannot be younger than 15 years
     # -	Date must not be in the future
     it 'should allow a valid date of birth' do
-      expect(Validator.date_of_birth '1994-02-05').to be true
+      expect(Validator.date_of_birth('1994-02-05')).to be true
     end
     it 'should not allow a blank date of birth' do
       expect(Validator.date_of_birth('')).to be false

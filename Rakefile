@@ -49,7 +49,6 @@ task :validate do
   LOG.info "Invalid driver_ids: #{invalid_records[:driver_id].count}"
   LOG.info "Invalid entitlements: #{invalid_records[:entitlements].count}"
   LOG.info "Total invalid records: #{invalid_records.values.flatten.count} out of #{imported_csv.count} records"
-
 end
 
 desc 'Load driver records and output files with valid and invalid records'
