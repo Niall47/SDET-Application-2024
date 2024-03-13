@@ -4,11 +4,11 @@ require_relative 'lib/driver'
 require_relative 'lib/file_handler'
 require_relative 'lib/validator'
 require 'logger'
-require 'pry'
 
 LOG = Logger.new(STDOUT)
-# LOG.level = Logger::DEBUG
-LOG.level = Logger::INFO
+LOG.datetime_format = '%H:%M:%S'
+LOG.level = Logger::DEBUG
+# LOG.level = Logger::INFO
 
 desc 'Load driver records and output the number of invalid records'
 task :validate do
@@ -37,7 +37,7 @@ task :validate do
   records.each do |record|
     record.validate
   rescue ValidationError => e
-    LOG.debug "#{e.value} was an invalid #{e.invalid_field}"
+    LOG.debug "#{e.value} was an invalid #{e.invalid_field} - #{record.inspect}"
     invalid_records[e.invalid_field.to_sym] << record
   rescue StandardError => e
     LOG.error "Unexpected error occurred: #{e}"
@@ -48,7 +48,8 @@ task :validate do
   LOG.info "Invalid date_of_births: #{invalid_records[:date_of_birth].count}"
   LOG.info "Invalid driver_ids: #{invalid_records[:driver_id].count}"
   LOG.info "Invalid entitlements: #{invalid_records[:entitlements].count}"
-  LOG.info "Total invalid records: #{invalid_records.values.flatten.count} out of #{imported_csv.count} records"
+  LOG.info "Total invalid records: #{invalid_records.values.flatten.count} / #{imported_csv.count} records"
+  LOG.info "Total valid records: #{imported_csv.count - invalid_records.values.flatten.count} / #{imported_csv.count} records"
 end
 
 desc 'Load driver records and output files with valid and invalid records'
@@ -75,14 +76,12 @@ task :sort do
     valid_records << record
   rescue ValidationError => e
     error = "#{e.value} was an invalid #{e.invalid_field}"
-    LOG.debug error
+    LOG.debug "#{error} #{record.inspect}"
     invalid_records << record
   rescue StandardError => e
     LOG.error "Unexpected error occurred: #{e}"
   end
 
-  FileHandler.save_to_file(filename: 'db/invalid_records.csv', file: invalid_records)
-  LOG.info "#{invalid_records.count} invalid records saved to db/invalid_records.csv"
   FileHandler.save_to_file(filename: 'db/valid_records.csv', file: valid_records)
-  LOG.info "#{valid_records.count} valid records saved to db/valid_records.csv"
+  LOG.info "#{valid_records.count} out of #{records.count} valid records saved to db/valid_records.csv"
 end
