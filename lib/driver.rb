@@ -13,8 +13,8 @@ class DriverRecord
     'D' => 'Bus'
   }.freeze
 
-  def initialize(last_name:, date_of_birth:, driver_id:, entitlements:, first_name: 'X')
-    @first_name = first_name
+  def initialize(last_name:, date_of_birth:, driver_id:, entitlements:, first_name:)
+    @first_name = first_name.empty? ? 'X' : first_name
     @last_name = last_name
     @date_of_birth = date_of_birth
     @driver_id = driver_id
