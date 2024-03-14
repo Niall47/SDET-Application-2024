@@ -35,7 +35,7 @@ task :validate do
   end
 
   records.each do |record|
-    record.validate
+    record.validate_record
   rescue ValidationError => e
     LOG.debug "#{e.value} was an invalid #{e.invalid_field} - #{record.inspect}"
     invalid_records[e.invalid_field.to_sym] << record
@@ -72,7 +72,7 @@ task :sort do
   end
 
   records.each do |record|
-    record.validate
+    record.validate_record
     valid_records << record
   rescue ValidationError => e
     error = "#{e.value} was an invalid #{e.invalid_field}"

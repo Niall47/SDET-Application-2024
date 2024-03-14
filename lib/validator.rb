@@ -16,33 +16,34 @@ module Validator
   DRIVER_ID_REGEX = /^[a-zA-Z]{5}\d{4}$/.freeze
   FIRST_NAME_PLACEHOLDER = 'X'.freeze
 
-  def self.validate_record(record:)
-    unless last_name_valid?(record.last_name)
+  def validate_record
+    unless last_name_valid?(last_name)
       raise ValidationError.new 'Invalid last name', invalid_field: 'last_name',
-                                                     value: record.last_name
+                                                     value: last_name
     end
-    unless first_name_valid?(record.first_name)
+    unless first_name_valid?(first_name)
       raise ValidationError.new 'Invalid first name', invalid_field: 'first_name',
-                                                      value: record.first_name
+                                                      value: first_name
     end
-    unless date_of_birth_valid?(record.date_of_birth)
+    unless date_of_birth_valid?(date_of_birth)
       raise ValidationError.new 'Invalid date of birth', invalid_field: 'date_of_birth',
-                                                         value: record.date_of_birth
+                                                         value: date_of_birth
     end
     unless driver_id_valid?(
-      driver_id: record.driver_id, first_name: record.first_name, last_name: record.last_name
+      driver_id: driver_id, first_name: first_name, last_name: last_name
     )
       raise ValidationError.new 'Invalid driver ID', invalid_field: 'driver_id',
-                                                     value: record.driver_id
+                                                     value: driver_id
+    end
+    unless entitlements_valid?(entitlements)
+      raise ValidationError.new 'Invalid entitlements', invalid_field: 'entitlements', value: entitlements
+
     end
 
-    return if entitlements_valid?(record.entitlements)
-
-    raise ValidationError.new 'Invalid entitlements', invalid_field: 'entitlements',
-                                                      value: record.entitlements
+    true
   end
 
-  def self.first_name_valid?(first_name)
+  def first_name_valid?(first_name)
     if first_name.match?(NAME_REGEX) || first_name == ''
       true
     else
@@ -50,7 +51,7 @@ module Validator
     end
   end
 
-  def self.last_name_valid?(last_name)
+  def last_name_valid?(last_name)
     if !last_name.empty? && last_name.match?(NAME_REGEX)
       true
     else
@@ -58,7 +59,7 @@ module Validator
     end
   end
 
-  def self.date_of_birth_valid?(date_of_birth)
+  def date_of_birth_valid?(date_of_birth)
     return false unless date_of_birth
     return false unless date_of_birth.match DATE_OF_BIRTH_REGEX
 
@@ -74,7 +75,7 @@ module Validator
     true
   end
 
-  def self.driver_id_valid?(driver_id:, first_name:, last_name:)
+  def driver_id_valid?(driver_id:, first_name:, last_name:)
     return false unless driver_id.match DRIVER_ID_REGEX
 
     first_name = FIRST_NAME_PLACEHOLDER if first_name == ''
@@ -84,7 +85,7 @@ module Validator
     true
   end
 
-  def self.entitlements_valid?(entitlements)
+  def entitlements_valid?(entitlements)
     elements = entitlements.scan(/\w+/)
     elements.each do |element|
       return false unless VALID_ENTITLEMENTS.include? element

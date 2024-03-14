@@ -21,12 +21,8 @@ class DriverRecord
     @entitlements = entitlements
   end
 
-  def validate
-    Validator.validate_record(record: self)
-  end
-
   def as_csv
-    "#{clean_name(last_name)},#{clean_name(first_name)},#{clean_date(date_of_birth)},#{driver_id},#{clean_entitlements(entitlements)}"
+    "#{clean_name(last_name)},#{clean_name(first_name)},\"#{clean_date(date_of_birth)}\",#{driver_id},#{clean_entitlements(entitlements)}"
   end
 
   def clean_name(name)
